@@ -121,7 +121,7 @@ def create_hourly_wind_df(data, town):
     return wind_data
 
 # Data yang digunakan
-aoti_df = setindex_time(pd.read_csv('aoti_df.csv'))
+aoti_df = setindex_time(pd.read_csv('https://raw.githubusercontent.com/nelumbium-nelumbo/air-quality-dashboard/main/aoti_df.csv'))
 
 #FILTER WAKTU DAN TOWN
 # Rentang waktu minimum dan maksimum setiap town adalah sama
