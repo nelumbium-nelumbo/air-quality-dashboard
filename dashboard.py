@@ -120,6 +120,21 @@ def create_hourly_wind_df(data, town):
     wind_data['angle'] = WindDirect(wind_data)
     return wind_data
 
+# Penentuan palet untuk visualisasi
+def custom_colors(numbers, maxcol = "#2e77bf", restcol = 'lightgrey'):
+    number_max = numbers.max()
+    pallete = []
+    for item in numbers:
+        if item == number_max:
+          pallete.append(maxcol)
+        else:
+          if type(restcol) is list:
+            for i in restcol:
+              pallete.append(i)
+          else:
+            pallete.append(restcol)
+    return pallete
+
 # Data yang digunakan
 aoti_df = setindex_time(pd.read_csv('https://raw.githubusercontent.com/nelumbium-nelumbo/air-quality-dashboard/main/aoti_df.csv'))
 
@@ -194,7 +209,7 @@ with tab1_1:
         main_aqi.iloc[:,8],
         marker='o',
         linewidth=8,
-        color="#7dd1e8",
+        color="#2e77bf",
         label="Daily AQI",)
     ax1.axhline(y=avg_aqi, color="#2e9dff", linestyle="--", linewidth=3, label="Average AQI")
     ax1.tick_params(axis='x', labelsize=50)
@@ -203,16 +218,21 @@ with tab1_1:
     st.pyplot(fig1)
     
 with tab1_2:
+    x_aqis = len(main_aqi.iloc[:,10].value_counts().sort_values(ascending=False).index)
+    restcols = ['#95b8bf', '#99b9bf', '#a7c4c9', '#a1bdc2', '#a3bbbf']
+    explodelist = [0.1, 0, 0, 0, 0, 0]
+    colors = custom_colors(main_aqi.iloc[:,10].value_counts().sort_values(ascending=False), restcol = restcols[:x_aqis])
     st.subheader("Measured AQI Statuses")
     fig2, ax2 = plt.subplots()
     ax2.pie(main_aqi.iloc[:,10].value_counts().sort_values(ascending=False), labels=main_aqi.iloc[:,10].value_counts().sort_values(ascending=False).index,
-          autopct='%1.1f%%', colors=sb.color_palette('Set2'), textprops={'fontsize': 10})
+          autopct='%1.1f%%', colors=colors, explode = explodelist[:x_aqis], textprops={'fontsize': 10})
     st.pyplot(fig2)
 
 with tab1_3:
+    colorss = custom_colors(main_aqi[polutant].mean().sort_values(ascending=False))
     st.subheader("Measured Pollutants (based on AQI)")
     fig3, ax3 = plt.subplots(figsize=(40, 20))
-    ax3.barh(main_aqi[polutant].mean().sort_values(ascending=False).index, main_aqi[polutant].mean().sort_values(ascending=False), align='center', color=sb.color_palette('Set2'))
+    ax3.barh(main_aqi[polutant].mean().sort_values(ascending=False).index, main_aqi[polutant].mean().sort_values(ascending=False), align='center', color=colorss)
     ax3.invert_yaxis()  # labels read top-to-bottom
     ax3.tick_params(axis='y', labelsize=40)
     ax3.tick_params(axis='x', labelsize=30)
@@ -240,16 +260,19 @@ with col2_4:
 
 tab2_1, tab2_2 = st.tabs(["Measured Pollutants", "Wind Speed & Direction"])
 with tab2_1:
+    x_polutants = len(main_aqi.iloc[len(main_aqi)-1,:5].sort_values(ascending=False).index)
+    explodelist2 = [0.1, 0, 0, 0, 0]
+    colorsss = custom_colors(main_aqi.iloc[len(main_aqi)-1,:5].sort_values(ascending=False), restcol = restcols[:x_polutants])
     st.subheader("Measured Pollutants 24-hours (based on AQI)")
     fig4, ax4 = plt.subplots()
     ax4.pie(main_aqi.iloc[len(main_aqi)-1,:5], labels=main_aqi.iloc[len(main_aqi)-1,:5].index,
-            autopct='%1.1f%%', colors=sb.color_palette('Set2'), textprops={'fontsize': 10})
+            autopct='%1.1f%%', colors=colorsss, explode = explodelist2[:x_polutants], textprops={'fontsize': 10})
     st.pyplot(fig4)
     
 with tab2_2:
     st.subheader("Wind Speed & Direction")
     fig5 = pex.bar_polar(main_wind.loc[str(end_date)], r="WSPM", theta="angle",
-                        color="WSPM"
+                        color="WSPM", color_continuous_scale=pex.colors.sequential.GnBu
                         )
     fig5.update_layout(
         polar = dict(
