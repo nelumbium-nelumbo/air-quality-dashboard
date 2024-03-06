@@ -260,7 +260,7 @@ with col2_4:
 
 tab2_1, tab2_2 = st.tabs(["Measured Pollutants", "Wind Speed & Direction"])
 with tab2_1:
-    x_polutants = len(main_aqi.iloc[len(main_aqi)-1,:5].sort_values()
+    x_polutants = len(main_aqi.iloc[len(main_aqi)-1,:5].sort_values())
     explodelist2 = [0.1, 0, 0, 0, 0]
     colorsss = custom_colors(main_aqi.iloc[len(main_aqi)-1,:5].sort_values(), restcol = restcols[:x_polutants])
     st.subheader("Measured Pollutants 24-hours (based on AQI)")
